@@ -1,65 +1,143 @@
-import Image from "next/image";
+/**
+ * Logomark — AI-Powered Logo Creator Demo
+ * Theme: Midnight Aurora — Deep space blacks with vibrant cyan/teal accents
+ * 
+ * This is a demo mockup. Features are simulated for presentation purposes.
+ */
+
+"use client";
+
+import { useState, useRef } from "react";
+import Navbar from "./components/Navbar";
+import Sidebar from "./components/Sidebar";
+import LogoCanvas from "./components/LogoCanvas";
+import BottomBar from "./components/BottomBar";
+import Toast from "./components/Toast";
+import ShareModal from "./components/ShareModal";
+import type { LogoCanvasRef } from "./components/LogoCanvas";
+
+export interface LogoConfig {
+  text: string;
+  fontSize: number;
+  fontFamily: string;
+  fontWeight: string;
+  textColor: string;
+  iconName: string;
+  iconColor: string;
+  iconSize: number;
+  iconPosition: "left" | "top" | "right" | "none";
+  backgroundColor: string;
+  backgroundType: "solid" | "gradient" | "transparent";
+  gradientFrom: string;
+  gradientTo: string;
+  gradientAngle: number;
+  borderRadius: number;
+  padding: number;
+  letterSpacing: number;
+}
 
 export default function Home() {
+  const canvasRef = useRef<LogoCanvasRef>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [zoom, setZoom] = useState(100);
+  
+  const [config, setConfig] = useState<LogoConfig>({
+    text: "Logomark",
+    fontSize: 48,
+    fontFamily: "Sora",
+    fontWeight: "600",
+    textColor: "#e8eaed",
+    iconName: "Hexagon",
+    iconColor: "#00d4aa",
+    iconSize: 56,
+    iconPosition: "left",
+    backgroundColor: "#16181f",
+    backgroundType: "gradient",
+    gradientFrom: "#16181f",
+    gradientTo: "#0a0b0f",
+    gradientAngle: 135,
+    borderRadius: 24,
+    padding: 48,
+    letterSpacing: -1,
+  });
+
+  const showToast = (message: string, type: "success" | "error" = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleSave = () => {
+    showToast("Logo saved to your collection!");
+  };
+
+  const handleExport = (format: "png" | "svg") => {
+    if (canvasRef.current) {
+      const dataUrl = canvasRef.current.exportImage();
+      const link = document.createElement("a");
+      link.download = `logo.${format}`;
+      link.href = dataUrl;
+      link.click();
+      showToast(`Logo exported as ${format.toUpperCase()}!`);
+    }
+  };
+
+  const handleCopyToClipboard = async () => {
+    if (canvasRef.current) {
+      try {
+        const dataUrl = canvasRef.current.exportImage();
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        await navigator.clipboard.write([
+          new ClipboardItem({ [blob.type]: blob })
+        ]);
+        showToast("Logo copied to clipboard!");
+      } catch {
+        showToast("Failed to copy to clipboard", "error");
+      }
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="flex flex-col" style={{ height: "100vh" }}>
+      <Navbar 
+        onSave={handleSave} 
+        onShare={() => setShowShareModal(true)} 
+      />
+      
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar config={config} setConfig={setConfig} />
+        
+        <main className="flex-1 flex flex-col overflow-hidden">
+          <LogoCanvas 
+            ref={canvasRef}
+            config={config} 
+            zoom={zoom}
+          />
+          
+          <BottomBar 
+            zoom={zoom}
+            setZoom={setZoom}
+            onExport={handleExport}
+            onCopy={handleCopyToClipboard}
+          />
+        </main>
+      </div>
+
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      )}
+
+      {showShareModal && (
+        <ShareModal 
+          onClose={() => setShowShareModal(false)}
+          onCopyLink={() => showToast("Link copied to clipboard!")}
+        />
+      )}
     </div>
   );
 }
