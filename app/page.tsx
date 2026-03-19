@@ -14,6 +14,7 @@ import LogoCanvas from "./components/LogoCanvas";
 import BottomBar from "./components/BottomBar";
 import Toast from "./components/Toast";
 import ShareModal from "./components/ShareModal";
+import ReleaseCard from "./components/ReleaseCard";
 import type { LogoCanvasRef } from "./components/LogoCanvas";
 
 export interface LogoConfig {
@@ -133,11 +134,13 @@ export default function Home() {
       )}
 
       {showShareModal && (
-        <ShareModal 
+        <ShareModal
           onClose={() => setShowShareModal(false)}
           onCopyLink={() => showToast("Link copied to clipboard!")}
         />
       )}
+
+      <ReleaseCard />
     </div>
   );
 }
