@@ -465,3 +465,77 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
+
+/* Release card */
+.release-card {
+  position: fixed;
+  bottom: 72px;
+  left: 20px;
+  z-index: 40;
+  width: 240px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.3s ease-out;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.release-card:hover {
+  border-color: var(--color-border-light);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.release-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.release-card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.release-card-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-foreground);
+  line-height: 1.4;
+}
+
+.release-card-description {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-foreground-muted);
+  line-height: 1.5;
+}
+
+.release-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.release-card-link:hover {
+  color: var(--color-accent-hover);
+}
